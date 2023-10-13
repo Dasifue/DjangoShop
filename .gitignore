@@ -1,0 +1,5 @@
+venvShop
+__pycache__
+
+/media/*
+!/media/default/
