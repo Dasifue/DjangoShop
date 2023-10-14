@@ -1,0 +1,50 @@
+from typing import Any
+from django import forms
+from django.core.exceptions import ValidationError
+
+from .models import User
+from .utils import slugify
+
+
+class RegisterForm(forms.ModelForm):
+
+    password = forms.CharField(max_length=20)
+    password_confirm = forms.CharField(max_length=20)
+
+    class Meta:
+        model = User
+        fields = ("username", "email", "password", "password_confirm")
+
+    def clean(self) -> dict[str, Any]:
+        password: str = self.cleaned_data.get("password")
+        password_confirm: str = self.cleaned_data.get("password_confirm")
+        if password != password_confirm:
+            raise ValidationError({"password": "Passwords didn't match!"})
+        
+        return super().clean()
+    
+    def clean_password(self):
+        password: str = self.cleaned_data.get("password")
+        
+        if len(password) < 8:
+            raise ValidationError("Password must contain minimum 8 elements!")
+        elif password.isdigit() or password.isalpha() or password.isspace() or password.islower() or password.isupper():
+            raise ValidationError("Password is too easy!")
+        return password
+    
+    
+
+class LoginForm(forms.Form):
+    password = forms.CharField(max_length=20)
+    username = forms.CharField(max_length=30)
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = (
+            "username",
+            "first_name",
+            "last_name",
+            "avatar",
+        )

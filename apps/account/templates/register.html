@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <div class="contact-form bg-light p-30">
+        <form method="post" action="{% url 'account:register' %}">
+            {% csrf_token %}
+            <div class="control-group">
+                <input type="text" class="form-control" id="name" placeholder="Your Userame" name="username"
+                    required="required" data-validation-required-message="Please enter your username" />
+                <p class="help-block text-danger">{{form.username.errors}}</p>
+            </div>
+            <div class="control-group">
+                <input type="email" class="form-control" id="email" placeholder="Your Email" name="email"
+                    required="required" data-validation-required-message="Please enter your email" />
+                <p class="help-block text-danger">{{form.email.errors}}</p>
+            </div>
+            <div class="control-group">
+                <input type="password" class="form-control" id="password" placeholder="Password" name="password"
+                    required="required" data-validation-required-message="Enter password" />
+                <p class="help-block text-danger">{{form.password.errors}}</p>
+            </div>
+            <div class="control-group">
+                <input type="password" class="form-control" id="password" placeholder="Repeat password" name="password_confirm"
+                    required="required" data-validation-required-message="Repeat password" />
+                <p class="help-block text-danger"></p>
+            </div>
+            <h3>{{error}}</h3>
+            <div>
+                <input type="submit" class="btn btn-primary py-2 px-4" value="Register">
+            </div>  
+        </form>
+    </div>  
+</div> 
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="contact-form bg-light p-30">
+        <h1>{{user.email}}</h1>
+
+        <div class="profile-management">
+            <a href="{% url 'account:profile_update' %}"><input type="button" class="btn btn-primary py-2 px-4" value="Update profile"></a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-management{
+        text-align: center;
+    }
+</style>
+{% endblock %}

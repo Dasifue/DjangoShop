@@ -4,7 +4,7 @@ from django.db import models
 class Category(models.Model):
     slug = models.SlugField(max_length=100, null=False, unique=True)
     name = models.CharField("Category name", max_length=25)
-    image = models.ImageField("Image", upload_to="category/", default="media/default/default-category.png")
+    image = models.ImageField("Image", upload_to="category/", default="default/default-category.png")
     description = models.TextField("Description", blank=True)
     parent = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Parent category")
 
@@ -56,7 +56,7 @@ class Product(models.Model):
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images", verbose_name="Product")
-    image = models.ImageField("Image", upload_to="products/", default="media/default/default-product.jpg")
+    image = models.ImageField("Image", upload_to="products/", default="default/default-product.jpg")
 
     class Meta:
         verbose_name = "Product image"

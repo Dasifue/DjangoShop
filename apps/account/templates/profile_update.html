@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <div class="contact-form bg-light p-30">
+        <form action="{% url 'account:profile_update' %}" method="post" enctype='multipart/form-data'>
+            {% csrf_token %}
+            <div class="control-group">
+                <img class="avatar" src="{{request.user.avatar.url}}" width="250px" height="250px">
+                {{form.as_p}}
+                <p class="help-block text-danger"></p>
+            </div>
+            <div>
+                <input type="submit" class="btn btn-primary py-2 px-4" value="Save changes">
+            </div>  
+        </form>
+        <div class="profile-management">
+            <a href="#"><input type="button" class="btn btn-primary py-2 px-4" value="Change email"></a>
+            <a href="#"><input type="button" class="btn btn-primary py-2 px-4" value="Reset password"></a>
+        </div>
+    </div>  
+</div> 
+
+<style>
+    .avatar{
+        margin-bottom: 20px;
+    }
+
+    .profile-management{
+        margin-top: 20px;
+        text-align: center;
+        
+    }
+</style>
+
+{% endblock %}
+
