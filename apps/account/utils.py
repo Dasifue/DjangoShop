@@ -3,8 +3,8 @@ import random
 
 def slugify(value: str):
 
-    elements = (".", "-", "_", "/", "@")
-    random_elements_list = [elements[random.randint(0, 4)] for i in range(0, len(value))]
+    elements = ("-", "_")
+    random_elements_list = [elements[random.randint(0, 2)] for i in range(0, len(value))]
 
     array = list(range(0, len(value)))
     random.shuffle(array)
