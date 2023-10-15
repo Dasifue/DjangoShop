@@ -3,7 +3,6 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 from .models import User
-from .utils import slugify
 
 
 class RegisterForm(forms.ModelForm):
@@ -48,3 +47,24 @@ class ProfileForm(forms.ModelForm):
             "last_name",
             "avatar",
         )
+
+
+class ResetPasswordForm(forms.ModelForm):
+
+    new_password = forms.CharField(max_length=50)
+
+    class Meta:
+        model = User
+        fields = (
+            "password",
+            "new_password",
+        )
+
+    def clean_new_password(self):
+        password: str = self.cleaned_data.get("new_password")
+        
+        if len(password) < 8:
+            raise ValidationError("Password must contain minimum 8 elements!")
+        elif password.isdigit() or password.isalpha() or password.isspace() or password.islower() or password.isupper():
+            raise ValidationError("Password is too easy!")
+        return password

@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 
-from .forms import RegisterForm, LoginForm, ProfileForm
+from .forms import RegisterForm, LoginForm, ProfileForm, ResetPasswordForm
 from .models import User
 
 from .utils import slugify
@@ -106,3 +106,29 @@ def profile_update_view(request):
     return render(request=request, template_name="profile_update.html", context=context)
 
 
+@login_required
+def reset_password_view(request):
+    form = ResetPasswordForm()
+
+    if request.method == "POST":
+        form = ResetPasswordForm(data=request.POST, instance=request.user)
+        password_failed = None
+        if form.is_valid():
+            user = authenticate(request=request, username=request.user.username, password=form.cleaned_data.get("password"))
+            if user is not None:
+                user: User = form.save(commit=False)
+                user.set_password(raw_password=form.cleaned_data.get("new_password"))
+                user.save()
+                return redirect("account:my_profile")
+            password_failed = "wrong password!"
+        context = {
+            "form": form,
+            "error": "Failed to reset password",
+            "password": password_failed,
+        }
+        return render(request=request, template_name="reset_password.html", context=context)
+
+    context = {
+        "form": form,
+    }
+    return render(request=request, template_name="reset_password.html", context=context)

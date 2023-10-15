@@ -10,4 +10,5 @@ urlpatterns = [
     path("logout/", view=views.logout_view, name="logout"),
     path("profile/", view=views.my_profile_view, name="my_profile"),
     path("profile/update/", view=views.profile_update_view, name="profile_update"),
+    path("profile/password/reset/", view=views.reset_password_view, name="reset_password")
 ]
