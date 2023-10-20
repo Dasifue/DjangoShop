@@ -5,7 +5,6 @@ from django.db import IntegrityError
 from ..account.models import User
 
 from ..account.utils import slugify
-from django.contrib.auth import authenticate
 
 class RegistrationSerializer(serializers.ModelSerializer):
 
@@ -33,19 +32,12 @@ class RegistrationSerializer(serializers.ModelSerializer):
     
 
     def create(self, validated_data):
-        while True:
-            try:
-                user = User.objects.create(
-                    slug = slugify(value=validated_data.get("username")),
-                    username = validated_data.get("username"),
-                    email = validated_data.get("email"),
-                )
-                user.set_password(raw_password=validated_data.get("password"))
-                user.save()
-            except IntegrityError:
-                continue
-            else:
-                break
+        user = User.objects.create(
+            username = validated_data.get("username"),
+            email = validated_data.get("email"),
+        )
+        user.set_password(raw_password=validated_data.get("password"))
+        user.save()
         return user
     
 

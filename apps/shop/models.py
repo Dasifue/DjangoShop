@@ -1,4 +1,8 @@
+from collections.abc import Iterable
 from django.db import models
+from django.db import IntegrityError
+
+from ..account.utils import slugify
 
 
 class Category(models.Model):
@@ -6,7 +10,7 @@ class Category(models.Model):
     name = models.CharField("Category name", max_length=25)
     image = models.ImageField("Image", upload_to="category/", default="default/default-category.png")
     description = models.TextField("Description", blank=True)
-    parent = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Parent category")
+    parent = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True, related_name="child_categories", verbose_name="Parent category")
 
     class Meta:
         verbose_name = "Category"
@@ -16,33 +20,48 @@ class Category(models.Model):
         return self.name
     
 
-class Product(models.Model):
-    XS = 'xs'
-    S = 's'
-    M = 'm'
-    L = 'l'
-    XL = 'xl'
-    SIZES = [
-        (XS, "XS"),
-        (S, "S"),
-        (M, "M"),
-        (L, "L"),
-        (XL, "XL"),
-    ]
-    COLORS = [
-        ("white", "White"),
-        ("black", "Black"),
-        ("green", "Green"),
-        ("red", "Red"),
-        ("blue", "Blue"),
-    ]
+    def save(self, *args, **kwargs) -> None:
+        while True:
+            self.slug = slugify(value=self.name)
+            try:
+                return super().save(*args, **kwargs)
+            except IntegrityError:
+                continue
+    
 
+
+class ProductSizes(models.Model):
+    size = models.CharField("Size", max_length=5)
+    
+    class Meta:
+        verbose_name = "Size"
+        verbose_name_plural = "Sizes"
+
+
+    def __str__(self):
+        return self.size
+
+
+class ProductColors(models.Model):
+    color = models.CharField("Color", max_length=25)
+
+    class Meta:
+        verbose_name = "Color"
+        verbose_name_plural = "Colors"
+
+
+    def __str__(self):
+        return self.color
+
+
+class Product(models.Model):
     slug = models.SlugField("Slug", max_length=100, null=False, unique=True)
     name = models.CharField("Product name", max_length=100)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, related_name="products", null=True, blank=False, verbose_name="Category")
     price = models.DecimalField("Price", max_digits=7, decimal_places=2)
-    size = models.CharField("Size", max_length=4, choices=SIZES)
-    color = models.CharField("Color", max_length=10, choices=COLORS)
+    discount = models.PositiveSmallIntegerField("Discount", blank=True, default=0)
+    sizes = models.ManyToManyField(ProductSizes, related_name="products")
+    colors = models.ManyToManyField(ProductColors, related_name="products")
     description = models.TextField("Description")
     created = models.DateTimeField("Date created", auto_now_add=True)
     
@@ -52,6 +71,27 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+    @property
+    def stars(self):
+        reviews = self.reviews.all()
+        stars = sum((review.stars for review in reviews)) / len(reviews)
+        return stars
+    
+    @property
+    def total_price(self):
+        price = float(self.price)
+        return price - (price * (self.discount / 100))
+
+    
+    def save(self, *args, **kwargs) -> None:
+        while True:
+            self.slug = slugify(value=self.name)
+            try:
+                return super().save(*args, **kwargs)
+            except IntegrityError:
+                continue
     
 
 class ProductImage(models.Model):
@@ -85,6 +125,15 @@ class Review(models.Model):
     class Meta:
         verbose_name = "Review"
         verbose_name_plural = "Reviews"
+
+    
+    def save(self, *args, **kwargs) -> None:
+        while True:
+            self.slug = slugify(value=f"{self.user.username}{self.product.name}")
+            try:
+                return super().save(*args, **kwargs)
+            except IntegrityError:
+                continue
 
 
 class ReviewImage(models.Model):

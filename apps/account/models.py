@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db import IntegrityError
 
+from .utils import slugify
 
 class User(AbstractUser):
     slug = models.SlugField("Slug", max_length=100, unique=True, null=False)
@@ -18,3 +20,14 @@ class User(AbstractUser):
     def full_name(self):
         full_name = f"{self.first_name} {self.last_name}"
         return full_name.strip()
+    
+
+    def save(self, *args, **kwargs):
+        while True:
+            self.slug = slugify(value=self.username)
+            try:
+                return super().save(*args, **kwargs)
+            except IntegrityError:
+                continue
+            
+        

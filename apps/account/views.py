@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.db import IntegrityError
 
 from .forms import RegisterForm, LoginForm, ProfileForm, ResetPasswordForm
 from .models import User
@@ -16,15 +15,7 @@ def register_view(request):
         if form.is_valid():
             user: User = form.save(commit=False)
             user.set_password(form.cleaned_data.get("password"))
-            success = False
-            while success==False:
-                user.slug = slugify(value=user.username)
-                try:
-                    user.save()
-                except IntegrityError:
-                    pass
-                else:
-                    success=True
+            user.save()
             login(request, user)
             return redirect("shop:index")
         
