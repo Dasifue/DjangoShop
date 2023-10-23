@@ -5,7 +5,6 @@ from django.contrib.auth.decorators import login_required
 from .forms import RegisterForm, LoginForm, ProfileForm, ResetPasswordForm
 from .models import User
 
-from .utils import slugify
 
 def register_view(request):
     form = RegisterForm()
