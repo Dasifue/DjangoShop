@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category, Product, ProductImage, Review, ReviewImage, ProductColors, ProductSizes
+from .models import Category, Product, ProductImage, Review, ReviewImage, ProductColors, ProductSizes, Cart, CartProduct, PromoCode
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ("slug", "name", "parent", "image")
@@ -18,6 +18,7 @@ class ProductImageInline(admin.StackedInline):
 
 class ProductAdmin(admin.ModelAdmin):
     list_display = ("slug", "name", "price", "created")
+    list_display_links = ("name",)
     list_filter = ("category", "price", "sizes", "colors")
     sortable_by = ("creted",)
     search_fields = ("slug", "name", "description")
@@ -37,6 +38,25 @@ class ReviewAdmin(admin.ModelAdmin):
     inlines = (ReviewImageInline, )
     exclude = ("slug", )
 
+
+@admin.register(PromoCode)
+class PromoCodeAdmin(admin.ModelAdmin):
+    list_display = ("name", "discount", "created", "expired")
+    list_filter = ("discount", "created", "expired")
+    search_fields = ("name", )
+
+
+class CartProductInline(admin.StackedInline):
+    model = CartProduct
+
+
+@admin.register(Cart)
+class CartAdmin(admin.ModelAdmin):
+    list_display = ("user", "status", "promo", "created")
+    list_filter = ("status", "promo")
+    search_fields = ("user", "created")
+    inlines = (CartProductInline,)
+    
 
 
 admin.site.register(Category, CategoryAdmin)

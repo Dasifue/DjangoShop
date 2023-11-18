@@ -4,60 +4,143 @@
 
 {% include 'banner.html' %}
 
-<div class="container-fluid pt-5 pb-3">
-    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Featured Products</span></h2>
-    <form method="get">
+<style>
+    .custom-price {
+        position: absolute;
+        left: 10px;
+    }
+</style>
 
-        <input type="radio" name="price" value="cheap"> <p>Сначала дешёвые</p>
-        <input type="radio" name="price" value="expensive"> <p>Сначала дорогие</p>
-        {% for size in sizes %}
-        <input type="checkbox" name="size" value="{{size.size}}"> <p>{{size.size}}</p>
-        {% endfor %}
+<form method="get">
 
-        <input type="submit" value="Search">
-    </form>
-    <div class="row px-xl-5">
+    <!-- Shop Start -->
+    <div class="container-fluid">
+        <div class="row px-xl-5">
+            <div class="col-lg-3 col-md-4">
+                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Filter by price</span></h5>
+                <div class="bg-light p-4 mb-3">
 
-        {% for product in products %}
-
-        <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
-            <div class="product-item bg-light mb-4">
-                <div class="product-img position-relative overflow-hidden">
-                    <img class="img-fluid w-100" src="{{ product.images.first.image.url }}" alt="">
-                    <div class="product-action">
-                        <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
-                        <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
-                        <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
-                        <a class="btn btn-outline-dark btn-square" href="{% url 'shop:product_details' slug=product.slug %}"><i class="fa fa-search"></i></a>
+                   
+                    <div class="custom-control d-flex align-items-center justify-content-between mb-3">
+                        <input type="number" class="custom-price" id="price-1" name="price__gt" placeholder="Granter then">
                     </div>
+
+                    <div class="custom-control d-flex align-items-center justify-content-between mb-3">
+                        <input type="number" class="custom-price" id="price-2" name="price__lt" placeholder="Less then">
+                    </div>
+                    
                 </div>
-                <div class="text-center py-4">
-                    <a class="h6 text-decoration-none text-truncate" href="{% url 'shop:product_details' slug=product.slug %}">{{ product.name }}</a>
-                    <div class="d-flex align-items-center justify-content-center mt-2">
-                        <h5>${{product.total_price}}</h5><h6 class="text-muted ml-2"><del>${{product.price}}</del></h6>
+                
+                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Filter by color</span></h5>
+                <div class="bg-light p-4 mb-30">
+                    {% for color in colors %}
+                    <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+                        <input type="checkbox" class="custom-control-input" id="color-{{ color.pk }}" name="colors" value="{{ color.pk }}">
+                        <label class="custom-control-label" for="color-{{ color.pk }}">{{ color.color }}</label>
                     </div>
-                    <div class="d-flex align-items-center justify-content-center mb-1">
+                    {% endfor %}
+                </div>
 
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star text-primary mr-1"></small>
-                        <small class="fa fa-star-half-alt text-primary mr-1"></small>
-
-                        <small>({{ product.reviews.count }})</small>
+                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Filter by size</span></h5>
+                <div class="bg-light p-4 mb-30">
+                    {% for size in sizes %}
+                    <div class="custom-control custom-checkbox d-flex align-items-center justify-content-between mb-3">
+                        <input type="checkbox" class="custom-control-input" id="size-{{ size.pk }}" name="sizes" value="{{ size.pk }}">
+                        <label class="custom-control-label" for="size-{{ size.pk }}">{{ size.size }}</label>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
+
+
+
+            <!-- Shop Product Start -->
+            <div class="col-lg-9 col-md-8">
+                <div class="row pb-3">
+                    <div class="col-12 pb-1">
+                        <div class="d-flex align-items-center justify-content-between mb-4">
+                            <div>
+                                <button class="btn btn-sm btn-light"><i class="fa fa-th-large"></i></button>
+                                <button class="btn btn-sm btn-light ml-2"><i class="fa fa-bars"></i></button>
+                            </div>
+                            <div class="col-lg-4 col-6 text-left">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Search for products" name="name">
+                                    <div class="input-group-append">
+                                        <button type="submit">
+                                        <span class="input-group-text bg-transparent text-primary">
+                                            <i class="fa fa-search"></i>
+                                        </span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ml-2">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">Sorting</button>
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        <input type="radio" class="dropdown-item" name="order_by" value="price"> From cheap to expensive
+                                        <input type="radio" class="dropdown-item" name="order_by" value="-price"> From expensive to cheap
+                                        <input type="radio" class="dropdown-item" name="order_by" value="created"> From oldest to newest
+                                        <input type="radio" class="dropdown-item" name="order_by" value="-created"> From newest to oldest
+                                        <!-- <a class="dropdown-item" href="?order_by=-price">From cheap to expensive</a> -->
+                                        <!-- <a class="dropdown-item" href="#">Latest</a> -->
+                                        <!-- <a class="dropdown-item" href="#">Latest</a> -->
+                                        <!-- <a class="dropdown-item" href="#">Latest</a> -->
+                                    </div>
+                                </div>
+                                <div class="btn-group ml-2">
+                                    <button type="button" class="btn btn-sm btn-light dropdown-toggle" data-toggle="dropdown">Showing</button>
+                                    <div class="dropdown-menu dropdown-menu-right">
+                                        <a class="dropdown-item" href="#">10</a>
+                                        <a class="dropdown-item" href="#">20</a>
+                                        <a class="dropdown-item" href="#">30</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% for product in filter.qs %}
+                    <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+                        <div class="product-item bg-light mb-4">
+                            <div class="product-img position-relative overflow-hidden">
+                                <img class="img-fluid w-100" src="{{ product.images.first.image.url }}" alt="">
+                                <div class="product-action">
+                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-shopping-cart"></i></a>
+                                    <a class="btn btn-outline-dark btn-square" href=""><i class="far fa-heart"></i></a>
+                                    <a class="btn btn-outline-dark btn-square" href=""><i class="fa fa-sync-alt"></i></a>
+                                    <a class="btn btn-outline-dark btn-square" href="{% url 'shop:product_details' slug=product.slug %}"><i class="fa fa-search"></i></a>
+                                </div>
+                            </div>
+                            <div class="text-center py-4">
+                                <a class="h6 text-decoration-none text-truncate" href="">{{ product.name }}</a>
+                                <div class="d-flex align-items-center justify-content-center mt-2">
+                                    <h5>${{product.total_price}}</h5><h6 class="text-muted ml-2"><del>${{product.price}}</del></h6>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-center mb-1">
+            
+                                    <small class="fa fa-star text-primary mr-1"></small>
+                                    <small class="fa fa-star text-primary mr-1"></small>
+                                    <small class="fa fa-star text-primary mr-1"></small>
+                                    <small class="fa fa-star text-primary mr-1"></small>
+                                    <small class="fa fa-star-half-alt text-primary mr-1"></small>
+            
+                                    <small>({{ product.reviews.count }})</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+
+                    
+                </div>
+            </div>
+            <!-- Shop Product End -->
         </div>
-        
-        {% empty %}
-
-        <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4"><span class="bg-secondary pr-3">Products not found</span></h2>
-
-        {% endfor %}
-
-        
     </div>
-</div>
+
+</form>
 
 {% endblock %}

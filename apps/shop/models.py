@@ -143,3 +143,49 @@ class ReviewImage(models.Model):
     class Meta:
         verbose_name = "Review image"
         verbose_name_plural = "Review images"
+
+
+class PromoCode(models.Model):
+    name = models.CharField("Name", max_length=20)
+    discount = models.PositiveSmallIntegerField("Discount")
+    created = models.DateField("Created at", auto_now_add=True)
+    expired = models.DateField("Expired at")
+
+    class Meta:
+        verbose_name = "Promo code"
+        verbose_name_plural = "Promo codes"
+    
+    def __str__(self):
+        return self.name
+
+
+class Cart(models.Model):
+    ACTIVE = "active"
+    FINISHED = "finished"
+    WAITING = "waiting"
+    CHOISES = (
+        (ACTIVE, "Active"),
+        (FINISHED, "Finished"),
+        (WAITING, "Waiting"),
+    )
+
+    user = models.ForeignKey("account.User", on_delete=models.CASCADE, related_name="carts", verbose_name="User")
+    status = models.CharField("Status", max_length=10, choices=CHOISES, default=ACTIVE)
+    promo = models.ForeignKey(PromoCode, null=True, on_delete=models.SET_NULL, related_name="carts", verbose_name="Promo code")
+    created = models.DateTimeField("Created at", auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Cart"
+        verbose_name_plural = "Carts"
+
+
+class CartProduct(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="cart_products", verbose_name="Cart")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="cart_products", verbose_name="Product")
+    quantity = models.PositiveSmallIntegerField("Quantiy")
+    color = models.CharField("Color", max_length=50)
+    size = models.CharField("Size", max_length=20)
+
+    class Meta:
+        verbose_name = "Cart Product"
+        verbose_name_plural = "Cart Products"

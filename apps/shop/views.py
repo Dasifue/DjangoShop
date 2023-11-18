@@ -1,9 +1,13 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import View, ListView, DetailView
-from django.db.models import Q
-from itertools import chain
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
-from .models import Category, Product, ProductSizes
+from .models import Category, Product, ProductSizes, ProductColors
+from .filtes import ProductFilter
+from .forms import CartProductForm
+from .utils import get_or_create_cart
+
 
 class IndexView(ListView):
     model = Category
@@ -33,35 +37,30 @@ def index_view(request):
     return render(request=request, template_name="index.html", context=context)
 
 
-def category_products_view(request, slug):
+def category_products_view(request, slug=None):
 
-    category = get_object_or_404(Category, slug=slug)
-    products = Product.objects.filter(category=category)
+    if slug is None:
+        queryset = Product.objects.all()
+    else:
+        queryset = Product.objects.filter(category__slug=slug)
+
+    order_by = request.GET.get("order_by")
+    if order_by is not None:
+        queryset = queryset.order_by(order_by)
+    
+    filter = ProductFilter(data=request.GET, queryset=queryset)
+
+
     sizes = ProductSizes.objects.all().distinct()
-
-    price = request.GET.get('price')
-
-    if price == 'expensive':
-        products = products.order_by("-price")
-    elif price == 'cheap':
-        products = products.order_by("price")
+    colors = ProductColors.objects.all().distinct()
 
 
-    sizes_ = request.GET.getlist('size')
-
-
-    if sizes_:
-        size_filter = Q()
-        for size in sizes_:
-            size_filter |= Q(sizes__size=size)
-
-        products = products.filter(size_filter).distinct()
         
 
     context = {
-        "category": category,
-        "products": products,
         "sizes": sizes,
+        "colors": colors,
+        "filter": filter,
     }
 
     return render(request=request, template_name="category_products.html", context=context)
@@ -78,15 +77,33 @@ def product_details_view(request, slug):
     return render(request=request, template_name="detail.html", context=context)
 
 
-def search_view(request):
+@login_required
+def add_to_cart_view(request, slug):
+    if request.method == "POST":
+        print(request.POST)
+        product = get_object_or_404(Product, slug=slug)
+        form = CartProductForm(data=request.POST)
+        cart = get_or_create_cart(request)
+        if form.is_valid():
+            cart_product = form.save(commit=False)
+            cart_product.cart = cart
 
-    search = request.GET.get("search")
-    products = Product.objects.filter(
-        Q(name__icontains=search) | Q(description__icontains=search)
-    )
+            updated = False
+            for c_p in cart.cart_products.all():
+                if c_p.product == product and c_p.color == form.cleaned_data["color"] and c_p.size == form.cleaned_data["size"]:
+                    c_p.quantity += form.cleaned_data["quantity"]
+                    c_p.save()
+                    updated = True
+                    break
 
-    context = {
-        "products": products
-    }
+            if updated == False:
+                cart_product.product = product
+                cart_product.save()
+            messages.info(request=request, message="Succesfully added to cart!")
+        else:        
+            messages.error(request=request, message=form.errors)
+            
 
-    return render(request=request, template_name="search_results.html", context=context)
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+    
+
