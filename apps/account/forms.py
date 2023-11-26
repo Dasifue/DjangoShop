@@ -42,11 +42,56 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = User
         fields = (
-            "username",
             "first_name",
             "last_name",
             "avatar",
+            "phone",
+            "address",
+            "country",
+            "city",
+            "zip",
         )
+
+    def clean_first_name(self):
+        first_name: str = self.cleaned_data["first_name"]
+
+        if not first_name.isalpha():
+            raise ValidationError(message="First name must contain only letters!")
+
+        return first_name
+    
+
+    def clean_last_name(self):
+        last_name: str = self.cleaned_data["last_name"]
+
+        if not last_name.isalpha():
+            raise ValidationError(message="Last name must contain only letters!")
+
+        return last_name
+    
+
+    def clean_phone(self):
+        phone: str = self.cleaned_data["phone"]
+
+        if not phone.isascii():
+            raise ValidationError("Not allowed simbols!")
+        
+        for letter in phone:
+            if letter.isalpha():
+                raise ValidationError("Not allowed simbols!")
+        
+        return phone
+    
+
+    def clean_zip(self):
+        zip: str = self.cleaned_data["zip"]
+
+        if not zip.isdigit():
+            raise ValidationError(message="ZIP code must contain only numbers!")
+
+        return zip
+
+
 
 
 class ResetPasswordForm(forms.ModelForm):

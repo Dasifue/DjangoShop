@@ -1,12 +1,24 @@
+import requests
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import View, ListView, DetailView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
-from .models import Category, Product, ProductSizes, ProductColors
 from .filtes import ProductFilter
 from .forms import CartProductForm
 from .utils import get_or_create_cart
+from .models import (
+    Category, 
+    Product, 
+    ProductSizes, 
+    ProductColors, 
+    CartProduct, 
+    PromoCode, 
+    Cart,
+    )
+
+from ..account.forms import ProfileForm
 
 
 class IndexView(ListView):
@@ -107,3 +119,63 @@ def add_to_cart_view(request, slug):
     return redirect(request.META.get('HTTP_REFERER', '/'))
     
 
+
+
+@login_required
+def cart_view(request):
+    cart = get_or_create_cart(request=request)
+
+    if request.method == "POST":
+        promo_code = PromoCode.objects.filter(name=request.POST.get("coupon")).first()
+        if promo_code is not None:
+            cart.promo = promo_code
+            cart.save()
+            messages.info(request=request, message="Promo code was applied!")
+        else:
+            messages.info(request=request, message="Promo not found!")
+
+    context = {
+        "cart": cart,
+    }
+
+    return render(request=request, template_name="cart.html", context=context)
+
+
+@login_required
+def delete_from_cart_view(request, pk):
+    cart_product = get_object_or_404(CartProduct, pk=pk)
+
+    cart = get_or_create_cart(request=request)
+
+    if cart_product in cart.cart_products.all():
+        cart_product.delete()
+
+    return redirect("shop:cart")
+
+@login_required
+def checkout_view(request):
+    cart = get_or_create_cart(request=request)
+    form = ProfileForm(instance=request.user)
+
+    if request.method == "POST":
+        form = ProfileForm(data=request.POST, instance=request.user)
+        if form.is_valid() and cart.cart_products.count() > 0:
+            form.save()
+            cart.status = Cart.WAITING
+            cart.save()
+        else:
+            messages.info(request=request, message="Cart must contain at least one product!")
+
+    url = "https://restcountries.com/v3.1/all?fields=name"
+    response = requests.get(url=url)
+
+    countries = [country['name']['official'] for country in response.json()]
+    countries.sort()
+
+    context = {
+        "cart": cart,
+        "form": form,
+        "countries": countries,
+    }
+
+    return render(request=request, template_name="checkout.html", context=context)

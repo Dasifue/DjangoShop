@@ -178,6 +178,25 @@ class Cart(models.Model):
         verbose_name = "Cart"
         verbose_name_plural = "Carts"
 
+    @property
+    def subtotal(self):
+        subtotal = sum(product.total_price for product in self.cart_products.all())
+        return subtotal
+    
+    @property
+    def discount(self):
+        if self.promo is not None:
+            discount = self.subtotal * self.promo.discount / 100
+        else:
+            discount = 0
+        return discount
+    
+    @property
+    def total(self):
+        total = self.subtotal - self.discount + 10
+        return total
+
+
 
 class CartProduct(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="cart_products", verbose_name="Cart")
@@ -189,3 +208,11 @@ class CartProduct(models.Model):
     class Meta:
         verbose_name = "Cart Product"
         verbose_name_plural = "Cart Products"
+
+
+    @property
+    def total_price(self):
+        price = self.product.total_price
+        total_price = self.quantity * price
+
+        return total_price

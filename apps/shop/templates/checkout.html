@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Breadcrumb Start -->
+<div class="container-fluid">
+    <div class="row px-xl-5">
+        <div class="col-12">
+            <nav class="breadcrumb bg-light mb-30">
+                <a class="breadcrumb-item text-dark" href="#">Home</a>
+                <a class="breadcrumb-item text-dark" href="#">Shop</a>
+                <span class="breadcrumb-item active">Checkout</span>
+            </nav>
+        </div>
+    </div>
+</div>
+<!-- Breadcrumb End -->
+
+<form method="post">
+    {% csrf_token %}
+    <!-- Checkout Start -->
+    <div class="container-fluid">
+        <div class="row px-xl-5">
+            <div class="col-lg-8">
+                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Billing Address</span></h5>
+                <div class="bg-light p-30 mb-5">
+                    <div class="row">
+                        {{form.errors}}
+                        <div class="col-md-6 form-group">
+                            <label>First Name</label>
+                            {{ form.first_name.errors }}
+                            <input class="form-control" type="text" placeholder="{{ request.user.first_name }}" value="{{ request.user.first_name }}" name="first_name" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Last Name</label>
+                            {{ form.last_name.errors }}
+                            <input class="form-control" type="text" placeholder="{{ request.user.last_name }}" value="{{ request.user.last_name }}" name="last_name" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>E-mail</label>
+                            <input class="form-control" type="text" placeholder="{{ request.user.email }}" name="email" readonly>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Mobile No</label>
+                            {{ form.phone.errors }}
+                            {% if not request.user.phone %}
+                            <input class="form-control" type="text" placeholder="+123 456 789" name="phone" required>
+                            {% else %}
+                            <input class="form-control" type="text" placeholder="{{ request.user.phone }}" value="{{ request.user.phone }}" name="phone" required>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Address Line 1</label>
+                            <input class="form-control" type="text" placeholder="{{ request.user.address }}" value="{{ request.user.address }}" name="address" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Country</label>
+                            <select class="custom-select" name="country" required>
+                                {% if request.user.country %}
+                                <option selected>{{ request.user.country }}</option>
+                                {% endif %}
+                                {% for country in countries %}
+                                <option>{{ country }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>City</label>
+                            <input class="form-control" type="text" placeholder="{{ request.user.city }}" value="{{ request.user.city }}" name="city" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>ZIP Code</label>
+                            {{ form.zip.errors }}
+                            <input class="form-control" type="text" placeholder="{{ request.user.zip }}" value="{{ request.user.zip }}" name="zip" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <h5 class="section-title position-relative text-uppercase mb-3"><span class="bg-secondary pr-3">Order Total</span></h5>
+                <div class="bg-light p-30 mb-5">
+                    <div class="border-bottom">
+                        <h6 class="mb-3">Products</h6>
+                        {% for cart_product in cart.cart_products.all %}
+                        <div class="d-flex justify-content-between">
+                            <p>{{ cart_product.product.name }}</p>
+                            <p>${{ cart_product.total_price }}</p>
+                        </div>
+                        {% endfor %}
+                        
+                    </div>
+                    <div class="border-bottom pt-3 pb-2">
+                        <div class="d-flex justify-content-between mb-3">
+                            <h6>Subtotal</h6>
+                            <h6>${{ cart.subtotal }}</h6>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <h6 class="font-weight-medium">Shipping</h6>
+                            <h6 class="font-weight-medium">$10</h6>
+                        </div>
+                        {% if cart.promo %}
+                        <div class="d-flex justify-content-between">
+                            <h6 class="font-weight-medium">Promo code</h6>
+                            <h6 class="font-weight-medium">-${{ cart.discount }}</h6>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="pt-2">
+                        <div class="d-flex justify-content-between mt-2">
+                            <h5>Total</h5>
+                            <h5>${{ cart.total }}</h5>
+                        </div>
+                    </div>
+                </div>
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+                        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+                        {{ message }}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+                <div class="mb-5">
+                    <div class="bg-light p-30">
+                        <button type="submit" class="btn btn-block btn-primary font-weight-bold py-3">Place Order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Checkout End -->
+</form>
+
+{% endblock %}
