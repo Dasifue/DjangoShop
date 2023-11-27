@@ -1,10 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
 from .forms import RegisterForm, LoginForm, ProfileForm, ResetPasswordForm
 from .models import User
-
+from ..shop.models import Product, ProductColors, ProductSizes
+from ..shop.filters import ProductFilter
 
 def register_view(request):
     form = RegisterForm()
@@ -122,3 +123,50 @@ def reset_password_view(request):
         "form": form,
     }
     return render(request=request, template_name="reset_password.html", context=context)
+
+
+@login_required
+def add_to_favorites_view(request, slug):
+    product = get_object_or_404(Product, slug=slug)
+    user = request.user
+
+    if product not in user.favorites.all():
+        user.favorites.add(product)
+
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+@login_required
+def remove_from_favorites_view(request, slug):
+    product = get_object_or_404(Product, slug=slug)
+    user = request.user
+
+    if product in user.favorites.all():
+        user.favorites.remove(product)
+
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+@login_required
+def favorites_view(request):
+    user: User = request.user
+
+    queryset = user.favorites.all()
+
+    order_by = request.GET.get("order_by")
+    if order_by is not None:
+        queryset = queryset.order_by(order_by)
+    
+    filter = ProductFilter(data=request.GET, queryset=queryset)
+
+
+    sizes = ProductSizes.objects.all().distinct()
+    colors = ProductColors.objects.all().distinct()
+
+    context = {
+        "sizes": sizes,
+        "colors": colors,
+        "filter": filter,
+    }
+
+    return render(request=request, template_name="favorites.html", context=context)

@@ -13,6 +13,7 @@ class User(AbstractUser):
     country = models.CharField("Country", max_length=50, null=True, blank=True)
     city = models.CharField("City", max_length=50, null=True, blank=True)
     zip = models.CharField("ZIP code", max_length=30, null=True, blank=True)
+    favorites = models.ManyToManyField("shop.Product", related_name="users", verbose_name="Favorites")
 
     class Meta:
         verbose_name = "User"

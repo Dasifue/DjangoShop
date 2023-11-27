@@ -5,7 +5,7 @@ from django.views.generic import View, ListView, DetailView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
-from .filtes import ProductFilter
+from .filters import ProductFilter
 from .forms import CartProductForm
 from .utils import get_or_create_cart
 from .models import (
@@ -65,9 +65,6 @@ def category_products_view(request, slug=None):
 
     sizes = ProductSizes.objects.all().distinct()
     colors = ProductColors.objects.all().distinct()
-
-
-        
 
     context = {
         "sizes": sizes,
