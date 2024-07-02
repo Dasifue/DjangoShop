@@ -1,0 +1,62 @@
+{% extends 'base.html' %} 
+
+{% block content %}
+
+{% include 'banner.html' %}
+
+
+<div class="fashion_section" style="margin-top: 50px;">
+  <div class="row row-cols-1 row-cols-md-2 g-4" style="margin-left: 50px; margin-right: 50px;">
+
+    {% for cloth in clothes %}
+
+    <div class="col-lg-4 col-sm-4 clothes">
+      <div class="box_main">
+        <h4 class="shirt_text">{{ cloth.name }}</h4>
+
+        {% if cloth.discount > 0 %}
+        <p class="price_text">Price <span style="color: #262626">${{ cloth.price }} - {{ cloth.discount }}% = ${{ cloth.price_with_discount }}</span></p>
+        {% elif cloth.discount == 0 %}
+        <p class="price_text">Price <span style="color: #262626">${{ cloth.price }}</span></p>
+        {% endif %}
+
+        <div class="tshirt_img"><img src="{{ cloth.image.url }}" height="350px" width="350px" /></div>
+        <div class="btn_main">
+          <div class="buy_bt"><a href="#">Buy Now</a></div>
+          <div class="seemore_bt"><a href="{% url 'get_clothes_by_id' id=cloth.id %}">See More</a></div>
+        </div>
+      </div>
+    </div>
+
+    {% endfor %}
+  </div>
+
+  <div class="pagination">
+    <div class="step-links">
+        {% if clothes.has_previous %}
+            <a href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page=1">&laquo; first</a>
+            <a href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ clothes.previous_page_number }}">previous</a>
+        {% endif %}
+  
+        <span class="current">
+            Page {{ clothes.number }} of {{ clothes.paginator.num_pages }}.
+        </span>
+  
+        {% if clothes.has_next %}
+            <a href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ clothes.next_page_number }}">next</a>
+            <a href="?{% if request.GET %}{{ request.GET.urlencode }}&{% endif %}page={{ clothes.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+      </div>
+  </div>
+  
+</div>
+
+
+
+
+<style>
+    div.clothes:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+</style>
+{% endblock %}

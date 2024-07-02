@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% include 'banner.html' %}
+
+{% for category in active_categories %}
+<div class="fashion_section">
+    <div id="main_slider" class="carousel slide" data-ride="carousel">
+       <div class="carousel-inner">
+          
+          <div class="carousel-item active">
+             <div class="container">
+                <h1 class="fashion_taital">{{ category.name }}</h1>
+                <div class="fashion_section_2">
+                   <div class="row">
+                    {% for cloth in category.get_first_six_clothes %}
+                      <div class="col-lg-4 col-sm-4">
+                         <div class="box_main">
+                            <h4 class="shirt_text">{{ cloth.name }}</h4>
+                            {% if cloth.discount > 0 %}
+                            <p class="price_text">Price <span style="color: #262626">${{ cloth.price }} - {{ cloth.discount }}% = ${{ cloth.price_with_discount }}</span></p>
+                            {% elif cloth.discount == 0 %}
+                            <p class="price_text">Price <span style="color: #262626">${{ cloth.price }}</span></p>
+                            {% endif %}
+                            <div class="tshirt_img"><img src="{{ cloth.image.url }}"></div>
+                            <div class="btn_main">
+                               <div class="buy_bt"><a href="#">Buy Now</a></div>
+                               <div class="seemore_bt"><a href="{% url 'get_clothes_by_id' id=cloth.id %}">See More</a></div>
+                            </div>
+                         </div>
+                      </div>
+                      {% endfor %}
+
+                   </div>
+                </div>
+             </div>
+          </div>
+       </div>
+    </div>
+ </div>
+{% endfor %}
+
+{% endblock %}

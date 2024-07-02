@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+{% include 'header_top.html' %}
+
+
+<div class="login-block">
+    <form action="{% url 'login' %}" method="post" class="register-form">
+        {% csrf_token %}
+        <h1 class="banner_taital form-title">
+            Login
+        </h1>
+        <p>
+            {{ message }}
+        </p>
+        
+        <div class="row">
+            <div class="col">
+                <li>{{ form.email.errors }}</li>
+                <input type="email" class="form-control" name="email" placeholder="Email" required>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <li>{{ form.password.errors }}</li>
+                <input type="password" class="form-control" name="password" placeholder="Password" required>
+            </div>
+            
+        </div>
+    
+        <input type="submit" class="btn btn-dark" value="Login">
+    
+    </form>
+
+    <p>Don't have any account? <a href="{% url 'register' %}">Sing up</a></p>
+</div>
+
+
+<style>
+    div.login-block {
+        margin: 20px 20% 20px 20%;
+    }
+    div.row {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    form.register-form {
+        padding-left: 20px;
+        padding-right: 20px;
+        text-align: center;
+    }
+    h1.form-title {
+        color: #252525;
+    }
+</style>
+
+{% endblock %}

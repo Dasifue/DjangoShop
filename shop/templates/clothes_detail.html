@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% include 'banner.html' %}
+
+
+<div class="fashion_section" style="margin-top: 50px;">
+    <div class="row" style="margin-left: 50px; margin-right: 50px;">
+  
+  
+      <div class="col-lg-12 col-sm-12">
+        <div class="box_main">
+        <div class="tshirt_img"><img src="{{ clothes.image.url }}" height="350px" width="350px" /></div>
+          <h4 class="shirt_text">{{ clothes.name }}</h4>
+
+          {% if clothes.discount > 0 %}
+          <p class="price_text">Price <span style="color: #262626">${{ clothes.price }} - {{ clothes.discount }}% = ${{ clothes.price_with_discount }}</span></p>
+          {% elif clothes.discount == 0 %}
+          <p class="price_text">Price <span style="color: #262626">${{ clothes.price }}</span></p>
+          {% endif %}
+
+          <p>{{ clothes.description }}</p>
+          <div class="btn_main">
+            <div class="buy_bt"><a href="#">Buy Now</a></div>
+            <div class="seemore_bt">{{ clothes.uploaded }}</div>
+          </div>
+        </div>
+      </div>
+    
+      
+    </div>
+  </div>
+
+{% endblock %}

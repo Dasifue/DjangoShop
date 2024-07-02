@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% include 'header_top.html' %}
+
+
+
+<div class="register-block">
+    <form action="{% url 'register' %}" method="post" class="register-form">
+        {% csrf_token %}
+        <h1 class="banner_taital form-title">
+            Registration
+        </h1>
+        
+        <div class="row">
+            <div class="col">
+                <li>{{ form.email.errors }}</li>
+                <input type="email" class="form-control" name="email" placeholder="Email" required>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <li>{{ form.password2.errors }}</li>
+                <input type="password" class="form-control" name="password1" placeholder="Password" required>
+            </div>
+            <div class="col">
+                <li>{{ form.password2.errors }}</li>
+                <input type="password" class="form-control" name="password2" placeholder="Confirm password" required>
+            </div>
+        </div>
+    
+        <input type="submit" class="btn btn-dark" value="Register">
+    
+    </form>
+    <p>Already have an account? <a href="{% url 'login' %}">Sing in</a></p>
+</div>
+
+
+<style>
+    div.register-block {
+        margin: 20px 15% 20px 15%;
+    }
+    div.row {
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    form.register-form {
+        padding-left: 20px;
+        padding-right: 20px;
+        text-align: center;
+    }
+    h1.form-title {
+        color: #252525;
+    }
+</style>
+
+{% endblock %}
