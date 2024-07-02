@@ -22,9 +22,14 @@
 
           <p>{{ clothes.description }}</p>
           <div class="btn_main">
-            <div class="buy_bt"><a href="#">Buy Now</a></div>
-            <div class="seemore_bt">{{ clothes.uploaded }}</div>
-          </div>
+            <div class="buy_bt">
+            <form action="{% url 'add_to_cart' clothes_id=clothes.id %}" method="get">
+                 <input type="number" name="quantity" id="quantity" value="1" min="1" max="100" style="width: 50px;">
+                 <input type="submit" value="Add" style="width: 50px;">
+              </form>
+           </div>
+           <div class="seemore_bt"><a href="{% url 'get_clothes_by_id' id=clothes.id %}">See More</a></div>
+         </div>
         </div>
       </div>
     

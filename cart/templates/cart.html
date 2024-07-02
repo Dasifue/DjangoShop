@@ -6,8 +6,51 @@
 
 
 <div class="fashion_section">
-
-    
+      <div id="main_slider" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+           
+           <div class="carousel-item active">
+              <div class="container">
+                 <h1 class="fashion_taital">Your cart</h1>
+                 <div class="fashion_section_2">
+                    <div class="row">
+                    {% for product in cart.products.all %}
+                       <div class="col-lg-4 col-sm-4">
+                          <div class="box_main">
+                             <h4 class="shirt_text">{{ product.clothes.name }}</h4>
+                             {% if product.clothes.discount > 0 %}
+                             <p class="price_text">Price <span style="color: #262626">${{ product.clothes.price }} - {{ product.clothes.discount }}% = ${{ product.clothes.price_with_discount }}</span></p>
+                             {% elif product.clothes.discount == 0 %}
+                             <p class="price_text">Price <span style="color: #262626">${{ product.clothes.price }}</span></p>
+                             {% endif %}
+                             <div class="tshirt_img"><img src="{{ product.clothes.image.url }}"></div>
+                             <div class="btn_main">
+                                <small class="text">
+                                    <form action="{% url 'change_quantity' cart_product_id=product.id %}" method="get">
+                                        <label for="quantity">Count</label>
+                                        <input class="quantity" type="number" name="quantity" id="quantity" value="{{ product.quantity }}" min="1" max="100">
+                                        <input type="submit" value="Change">
+                                        <a href="{% url 'delete_from_cart' cart_product_id=product.id %}">Delete</a>
+                                    </form>
+                                </small>
+                             </div>
+                          </div>
+                       </div>
+                       {% endfor %}
+ 
+                    </div>
+                 </div>
+              </div>
+           </div>
+        </div>
+     </div>
 </div>
+
+
+<style>
+    input.quantity {
+        width: 100px;
+    }
+</style>
 
 {% endblock %}
