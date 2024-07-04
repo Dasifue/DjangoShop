@@ -13,14 +13,14 @@
             Registration
         </h1>
         
-        <div class="row">
+        <div class="row-input">
             <div class="col">
                 <li>{{ form.email.errors }}</li>
                 <input type="email" class="form-control" name="email" placeholder="Email" required>
             </div>
         </div>
 
-        <div class="row">
+        <div class="row-input">
             <div class="col">
                 <li>{{ form.password2.errors }}</li>
                 <input type="password" class="form-control" name="password1" placeholder="Password" required>
@@ -42,7 +42,7 @@
     div.register-block {
         margin: 20px 15% 20px 15%;
     }
-    div.row {
+    div.row-input {
         margin-top: 20px;
         margin-bottom: 20px;
     }
@@ -53,6 +53,7 @@
     }
     h1.form-title {
         color: #252525;
+        margin-top: 50px;
     }
 </style>
 
