@@ -6,6 +6,20 @@ class Cart(models.Model):
     user = models.OneToOneField("users.User", on_delete=models.CASCADE, related_name="cart")
     created_at = models.DateTimeField(verbose_name="creation date", auto_now_add=True)
 
+    @property
+    def products_count(self) -> int:
+        products = self.products.values_list("quantity", flat=True)
+        return sum(products)
+    
+    @property
+    def total_sum(self):
+        total = 0
+        for product in self.products.all():
+            total += product.clothes.price_with_discount * product.quantity
+        
+        return total
+
+
 
 
 class CartProduct(models.Model):

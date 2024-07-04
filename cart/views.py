@@ -47,3 +47,9 @@ def delete_from_cart(request, cart_product_id):
     cart_product = get_object_or_404(CartProduct, id=cart_product_id)
     cart_product.delete()
     return redirect(request.META.get("HTTP_REFERER", "/"))
+
+
+@login_required
+def reset_cart(request):
+    request.user.cart.products.all().delete()
+    return redirect(request.META.get("HTTP_REFERER", "/"))

@@ -36,6 +36,8 @@
                              </div>
                           </div>
                        </div>
+                       {% empty %}
+                       <h1 class="fashion_taital"> Your cart is empty </h1>
                        {% endfor %}
  
                     </div>
@@ -44,13 +46,56 @@
            </div>
         </div>
      </div>
+
+     <div class="total">
+      <span class="info">
+         <p class="info-text">
+            Total products count: <b>{{ cart.products_count }}</b>
+            Total sum: <b>${{ cart.total_sum }}</b>
+         </p>
+      </span>
+
+      <span class="reset-cart">
+         <h3>
+            <a href="{% url 'reset_cart' %}">
+               Reset cart
+            </a>
+         </h3>
+      </span>
+     </div>
+
 </div>
 
 
+
+
 <style>
-    input.quantity {
-        width: 100px;
-    }
+   div.total {
+      background-color: rgb(233, 233, 233);
+      padding: 30px 10% 30px 10%;
+   }
+   span.info {
+      display: inline-block;
+      width: 60%;
+   }
+   span.reset-cart {
+      display: inline-block;
+      text-align: right;
+      width: 30%;
+   }
+   p.info-text {
+      font-size: large;
+   }
+   b {
+      color: black;
+      margin-right: 30px;
+   }
+   input.quantity {
+      width: 100px;
+   }
+   div.fashion_section {
+      padding-bottom: 0px;
+   }
 </style>
 
 {% endblock %}

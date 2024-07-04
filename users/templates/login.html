@@ -16,14 +16,14 @@
             {{ message }}
         </p>
         
-        <div class="row">
+        <div class="row-input">
             <div class="col">
                 <li>{{ form.email.errors }}</li>
                 <input type="email" class="form-control" name="email" placeholder="Email" required>
             </div>
         </div>
 
-        <div class="row">
+        <div class="row-input">
             <div class="col">
                 <li>{{ form.password.errors }}</li>
                 <input type="password" class="form-control" name="password" placeholder="Password" required>
@@ -43,7 +43,7 @@
     div.login-block {
         margin: 20px 20% 20px 20%;
     }
-    div.row {
+    div.row-input {
         margin-top: 20px;
         margin-bottom: 20px;
     }
@@ -54,6 +54,7 @@
     }
     h1.form-title {
         color: #252525;
+        margin-top: 50px;
     }
 </style>
 
